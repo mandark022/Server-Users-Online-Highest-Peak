@@ -1,0 +1,33 @@
+
+//Highest Peak
+-	script	Highest Peak	-,{
+
+OnPCLoginEvent:
+	
+
+	set .currentUsersOL,getusers(1); //Current Online Users
+	
+	//Query for the highest peak in the database
+	query_sql("SELECT `num_users` FROM `cp_highest_peak` ORDER BY `num_users` LIMIT 1",.@numUsers);
+	//Get the date
+	set .date$,gettime(7)+"-"+gettime(6)+"-"+gettime(5);	
+	
+	set .highestPeak,.@numUsers[0]; //Highest Peak
+	if(getarraysize(.@numUsers) == 0)
+	{
+		//If not data found Insert statement
+		set .highestPeak,.currentUsersOL;
+		query_sql("INSERT INTO `cp_highest_peak`(num_users,peak_date) VALUES("+.highestPeak+",'"+.date$+"')"); //Insert new highest Peak
+	}
+	else
+	{
+		if(.currentUsersOL>.highestPeak)
+		{
+			announce ""+.currentUsersOL,bc_all;
+			set .highestPeak,.currentUsersOL;		
+			query_sql("UPDATE `cp_highest_peak`SET num_users='"+.highestPeak+"',peak_date='"+.date$+"'"); //Insert new highest Peak
+		}
+	}
+end;
+
+}
